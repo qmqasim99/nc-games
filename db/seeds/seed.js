@@ -22,7 +22,7 @@ const seed = (data) => {
       .then(() => {
         return db.query(`create table categories (
           slug varchar(100) primary key not null,
-          description text
+          description text NOT NULL
         )`);
       })
       .then(() => {
@@ -36,13 +36,13 @@ const seed = (data) => {
         return db.query(`create table reviews (
         review_id SERIAL PRIMARY KEY, 
         title varchar not null,
-        review_body text,
-        designer varchar,
-        review_img_url text default 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
-        votes INT DEFAULT 0,
-        category varchar(100) references CATEGORIES (slug) ON DELETE CASCADE,
+        review_body text NOT NULL,
+        designer varchar NOT NULL,
+        review_img_url text default 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg' NOT NULL,
+        votes INT DEFAULT 0 NOT NULL,
+        category varchar(100) references CATEGORIES (slug)  ON DELETE CASCADE,
         owner varchar(50) references users(username) ON DELETE CASCADE,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW() 
+        created_at TIMESTAMP  DEFAULT NOW() NOT NULL 
       )`);
       })
       .then(() => {
@@ -51,8 +51,8 @@ const seed = (data) => {
         author varchar(50) references users(username) ON DELETE CASCADE,
         review_id INT references REVIEWS (review_id) ON DELETE CASCADE,
         votes INT DEFAULT 0,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW() ,
-        body text
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        body text NOT NULL
       )`);
       })
 
@@ -136,9 +136,6 @@ const seed = (data) => {
         );
 
         return db.query(queryStr);
-      })
-      .then((response) => {
-        console.log(response.rows);
       })
   );
 };
