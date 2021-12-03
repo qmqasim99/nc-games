@@ -1,8 +1,44 @@
+const { orderBy } = require("lodash");
 const db = require("../db/connection");
 
-exports.selectReviews = async () => {
-  const result = await db.query(`
-    SELECT * FROM reviews`);
+exports.selectReviews = async (
+  sort_by = "created_at",
+  order = "DESC",
+  category
+) => {
+  const columns = [
+    "review_id",
+    "title",
+    "designer",
+    "owner",
+    "category",
+    "created_at",
+    "votes",
+  ];
+
+  if (!columns.includes(sort_by)) {
+    console.log("INVALID SORT");
+    return Promise.reject({ status: 400, msg: "Invalid sort_by query" });
+  }
+
+  if (!["DESC", "ASC"].includes(order)) {
+    console.log("INVALID ORDER");
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
+
+  const queryValue = [];
+  let queryStr = `SELECT owner, title, reviews.review_id, review_body, designer, review_img_url, category, reviews.created_at, reviews.votes, COUNT(comments.review_id) :: INT AS comment_count from reviews
+  LEFT JOIN comments on reviews.review_id = comments.review_id `;
+
+  if (category) {
+    queryValue.push(category);
+    queryStr += `WHERE category = $1 `;
+  }
+
+  queryStr += `GROUP BY reviews.review_id ORDER BY ${sort_by} ${order} ;`;
+
+  const result = await db.query(queryStr, queryValue);
+
   return result.rows;
 };
 
@@ -14,7 +50,6 @@ exports.selectReviewsById = async (review_id) => {
 GROUP BY reviews.review_id;`,
     [review_id]
   );
-  //console.log(review.rows);
   // if no review found for this id
   if (!review.rows[0]) {
     console.log("IN MODEL: PROMISE REJECT");
@@ -29,7 +64,6 @@ GROUP BY reviews.review_id;`,
 
 exports.updateReviewVotes = async (review_id, voteBody) => {
   const { inc_votes } = voteBody;
-  //console.log("in model ...", inc_votes, review_id);
 
   // get the review first
 
@@ -52,5 +86,22 @@ exports.updateReviewVotes = async (review_id, voteBody) => {
     });
   } else {
     return review.rows[0];
+  }
+};
+
+exports.selectCommentsByReviewId = async (review_id) => {
+  const comments = await db.query(
+    `SELECT comment_id :: INT, votes :: INT, created_at, author, body  FROM comments WHERE review_id=$1;`,
+    [review_id]
+  );
+  // if no comments found for this id
+  if (!comments.rows[0]) {
+    console.log("IN MODEL: PROMISE REJECT");
+    return Promise.reject({
+      status: 404,
+      msg: "We could not get comments for review_id " + review_id,
+    });
+  } else {
+    return comments.rows;
   }
 };

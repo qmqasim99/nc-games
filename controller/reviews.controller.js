@@ -2,11 +2,14 @@ const {
   selectReviews,
   selectReviewsById,
   updateReviewVotes,
+  selectCommentsByReviewId,
 } = require("../model/reviews.model");
 
 exports.getReviews = async (req, res, next) => {
   try {
-    const reviews = await selectReviews();
+    const { sort_by, order, category } = req.query;
+
+    const reviews = await selectReviews(sort_by, order, category);
     res.status(200).send({ reviews: reviews });
   } catch (err) {
     next(err);
@@ -24,7 +27,6 @@ exports.getReviewsById = async (req, res, next) => {
 };
 
 exports.patchReviewVotes = async (req, res, next) => {
-  console.log("in patch...");
   try {
     const review_id = req.params.review_id;
     const voteBody = req.body;
@@ -35,6 +37,16 @@ exports.patchReviewVotes = async (req, res, next) => {
     console.log("IN CONTROLLER ERROR...", err.message);
 
     console.log(err.status, err.code);
+    next(err);
+  }
+};
+
+exports.getCommentsByReviewId = async (req, res, next) => {
+  try {
+    const { review_id } = req.params;
+    const comments = await selectCommentsByReviewId(review_id);
+    res.status(200).send({ comments: comments });
+  } catch (err) {
     next(err);
   }
 };

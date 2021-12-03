@@ -46,11 +46,6 @@ describe("TEST CATEGORIES", () => {
 // !  TEST REVIEWS
 
 describe("TESTING REVIEWS", () => {
-  test("should return ALL reviews", async () => {
-    const { body } = await request(app).get("/api/reviews").expect(200);
-    expect(body.reviews).toBeInstanceOf(Array);
-  });
-
   test("Should return reviews by ID", async () => {
     const { body } = await request(app).get("/api/reviews/3").expect(200);
     console.log(body.review);
@@ -106,5 +101,117 @@ describe(" TEST VOTE UPDATES ", () => {
       .send(newVote)
       .expect(400);
     expect(body.msg).toBe("Received 22P02 error message");
+  });
+});
+
+// ! TEST SORT BY & ORDER BY and FILTER BY
+
+describe("Get reviews with sort by and order by", () => {
+  test("should return ALL reviews", async () => {
+    const { body } = await request(app).get("/api/reviews").expect(200);
+    expect(body.reviews).toBeInstanceOf(Array);
+  });
+
+  test("should return reviews by title sort DESC order ", async () => {
+    const {
+      body: { reviews },
+    } = await request(app).get("/api/reviews?sort_by=title").expect(200);
+
+    expect(reviews).toBeInstanceOf(Array);
+    expect(reviews[0].title).toBe("Ultimate Werewolf");
+  });
+
+  test("status: 400 for invalid sort_by query ", async () => {
+    const { body } = await request(app)
+      .get("/api/reviews?sort_by=invalid_column ")
+      .expect(400);
+
+    expect(body.msg).toBe("Invalid sort_by query");
+  });
+
+  test("should return reviews by title sort ASC order ", async () => {
+    const {
+      body: { reviews },
+    } = await request(app)
+      .get("/api/reviews?sort_by=title&order=ASC")
+      .expect(200);
+    expect(reviews).toBeInstanceOf(Array);
+    expect(reviews[0].title).toBe(
+      "A truly Quacking Game; Quacks of Quedlinburg"
+    );
+  });
+
+  test("status: 400 for invalid order query ", async () => {
+    const { body } = await request(app)
+      .get("/api/reviews?sort_by=title&order=ASCCCC ")
+      .expect(400);
+
+    expect(body.msg).toBe("Invalid order query");
+  });
+
+  test("should return reviews by title sort ASC order FILTERED BY category=strategy", async () => {
+    const {
+      body: { reviews },
+    } = await request(app)
+      .get("/api/reviews?sort_by=title&order=ASC&category=social deduction")
+      .expect(200);
+    expect(reviews).toBeInstanceOf(Array);
+    expect(reviews[0].title).toBe(
+      "A truly Quacking Game; Quacks of Quedlinburg"
+    );
+  });
+
+  test("status: 400 for invalid order query ", async () => {
+    const { body } = await request(app)
+      .get("/api/reviews?sort_by=title&order=ASCCCC ")
+      .expect(400);
+
+    expect(body.msg).toBe("Invalid order query");
+  });
+});
+
+// ! TEST: GET COMMENTS BY REVIEW ID
+
+describe("GET COMMENTS BY REVIEW ID", () => {
+  test("should get comments by review ID", async () => {
+    const {
+      body: { comments },
+    } = await request(app).get("/api/reviews/2/comments").expect(200);
+
+    expect(comments).toBeInstanceOf(Array);
+    expect(comments).toHaveLength(3);
+    comments.forEach((comment) => {
+      expect(comment).toEqual(
+        expect.objectContaining({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+        })
+      );
+    });
+  });
+
+  test("Should return 404 for non-existent ID", async () => {
+    const { body } = await request(app)
+      .get("/api/reviews/100/comments")
+      .expect(404);
+
+    expect(body.msg).toBe("We could not get comments for review_id 100");
+  });
+
+  test("Should return 400 for bad review ID", async () => {
+    const { body } = await request(app)
+      .get("/api/reviews/myID/comments")
+      .expect(400);
+
+    expect(body.msg).toBe("Received 22P02 error message");
+  });
+
+  test("Should return 400 for invalid path", async () => {
+    const { body } = await request(app).get("/api/reviews/2/comm").expect(404);
+
+    expect(body.msg).toBe("We could not fulfil your request");
   });
 });
