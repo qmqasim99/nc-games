@@ -3,6 +3,7 @@ const {
   selectReviewsById,
   updateReviewVotes,
   selectCommentsByReviewId,
+  insertCommentsByReviewId,
 } = require("../model/reviews.model");
 
 exports.getReviews = async (req, res, next) => {
@@ -47,6 +48,23 @@ exports.getCommentsByReviewId = async (req, res, next) => {
     const comments = await selectCommentsByReviewId(review_id);
     res.status(200).send({ comments: comments });
   } catch (err) {
+    next(err);
+  }
+};
+
+exports.postCommentsByReviewId = async (req, res, next) => {
+  try {
+    const review_id = req.params.review_id;
+    const commentBody = req.body;
+
+    console.log("IN postCommentsByReviewId", review_id, commentBody);
+
+    const comment = await insertCommentsByReviewId(review_id, commentBody);
+    res.status(201).send({ comment: comment });
+  } catch (err) {
+    console.log("IN CONTROLLER ERROR...", err.message);
+
+    console.log(err.status, err.code);
     next(err);
   }
 };

@@ -105,3 +105,23 @@ exports.selectCommentsByReviewId = async (review_id) => {
     return comments.rows;
   }
 };
+
+exports.insertCommentsByReviewId = async (review_id, commentBody) => {
+  const { username, body } = commentBody;
+
+  const comment = await db.query(
+    `INSERT INTO comments (review_id, author, body) 
+     VALUES($1, $2, $3) RETURNING *;`,
+    [review_id, username, body]
+  );
+  console.log(comment.rows[0]);
+  // if no review found for this id
+  if (!comment.rows[0]) {
+    return Promise.reject({
+      status: 404,
+      msg: "Comment could not be inserted for review_id " + review_id,
+    });
+  } else {
+    return comment.rows[0];
+  }
+};

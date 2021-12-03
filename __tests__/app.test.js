@@ -110,6 +110,9 @@ describe("Get reviews with sort by and order by", () => {
   test("should return ALL reviews", async () => {
     const { body } = await request(app).get("/api/reviews").expect(200);
     expect(body.reviews).toBeInstanceOf(Array);
+    expect(body.reviews).toBeSortedBy("created_at", {
+      descending: true,
+    });
   });
 
   test("should return reviews by title sort DESC order ", async () => {
@@ -119,6 +122,9 @@ describe("Get reviews with sort by and order by", () => {
 
     expect(reviews).toBeInstanceOf(Array);
     expect(reviews[0].title).toBe("Ultimate Werewolf");
+    expect(reviews).toBeSortedBy("title", {
+      descending: true,
+    });
   });
 
   test("status: 400 for invalid sort_by query ", async () => {
@@ -139,6 +145,7 @@ describe("Get reviews with sort by and order by", () => {
     expect(reviews[0].title).toBe(
       "A truly Quacking Game; Quacks of Quedlinburg"
     );
+    expect(reviews).toBeSortedBy("title");
   });
 
   test("status: 400 for invalid order query ", async () => {
@@ -214,4 +221,51 @@ describe("GET COMMENTS BY REVIEW ID", () => {
 
     expect(body.msg).toBe("We could not fulfil your request");
   });
+});
+
+describe.only(" POST /api/reviews/:review_id/comments", () => {
+  test("status:201, responds with comments newly added to the database", async () => {
+    const newComment = {
+      username: "bainesface",
+      body: "new comment added",
+    };
+
+    const {
+      body: { comment },
+    } = await request(app)
+      .post("/api/reviews/2/comments")
+      .send(newComment)
+      .expect(201);
+    expect(typeof comment).toBe("object");
+    expect(comment.comment_id).toBe(7);
+  });
+
+  test("status:400, Dont insert if username or body is NULL", async () => {
+    const newComment = {
+      username: "",
+      body: "new comment added",
+    };
+
+    const { body } = await request(app)
+      .post("/api/reviews/2/comments")
+      .send(newComment)
+      .expect(400);
+    expect(body.msg).toBe(
+      "Received 23503 error message: Foreign Key violation"
+    );
+  });
+
+  // test.only("status:400, Dont insert if body is NULL", async () => {
+  //   const newComment = {
+  //     username: "bainesface",
+  //   };
+
+  //   const { body } = await request(app)
+  //     .post("/api/reviews/2/comments")
+  //     .send(newComment)
+  //     .expect(400);
+  //   expect(body.msg).toBe(
+  //     "Received 23503 error message: Foreign Key violation"
+  //   );
+  // });
 });
