@@ -10,3 +10,6 @@ jobs:
     steps:
       - name: Say hello
         run: echo 'Hello everyone from the pipeline!'
+
+  test:
+    runs-on: ubuntu-latest
