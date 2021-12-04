@@ -10,21 +10,3 @@ jobs:
     steps:
       - name: Say hello
         run: echo 'Hello everyone from the pipeline!'
-
-   test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout and clone repo
-        uses: actions/checkout@v2
-
-      - name: Setup Postgres
-        uses: harmon758/postgresql-action@v1
-        with:
-          postgresql db: test_db
-          postgresql user: testing
-          postgresql password: pass
-
-      - name: Install dependencies
-        run: npm install
-      - name: Test everything
-        run: PGDATABASE=test_db PGUSER=testing PGPASSWORD=pass npm test 
