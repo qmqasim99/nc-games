@@ -109,6 +109,19 @@ exports.selectCommentsByReviewId = async (review_id) => {
 exports.insertCommentsByReviewId = async (review_id, commentBody) => {
   const { username, body } = commentBody;
 
+  if (!username) {
+    return Promise.reject({
+      status: 400,
+      msg: "Username was not provided",
+    });
+  }
+  if (!body) {
+    return Promise.reject({
+      status: 400,
+      msg: "No comments were provided",
+    });
+  }
+
   const comment = await db.query(
     `INSERT INTO comments (review_id, author, body) 
      VALUES($1, $2, $3) RETURNING *;`,

@@ -223,7 +223,7 @@ describe("GET COMMENTS BY REVIEW ID", () => {
   });
 });
 
-describe.only(" POST /api/reviews/:review_id/comments", () => {
+describe(" POST /api/reviews/:review_id/comments", () => {
   test("status:201, responds with comments newly added to the database", async () => {
     const newComment = {
       username: "bainesface",
@@ -240,9 +240,33 @@ describe.only(" POST /api/reviews/:review_id/comments", () => {
     expect(comment.comment_id).toBe(7);
   });
 
-  test("status:400, Dont insert if username or body is NULL", async () => {
+  test("status:400, Dont insert if username is not provided", async () => {
     const newComment = {
-      username: "",
+      body: "new comment added",
+    };
+
+    const { body } = await request(app)
+      .post("/api/reviews/2/comments")
+      .send(newComment)
+      .expect(400);
+    expect(body.msg).toBe("Username was not provided");
+  });
+
+  test("status:400, Dont insert if body is not defined", async () => {
+    const newComment = {
+      username: "bainesface",
+    };
+
+    const { body } = await request(app)
+      .post("/api/reviews/2/comments")
+      .send(newComment)
+      .expect(400);
+    expect(body.msg).toBe("No comments were provided");
+  });
+
+  test("status:400, Dont insert if username does not exist", async () => {
+    const newComment = {
+      username: "notValidUsername",
       body: "new comment added",
     };
 
@@ -254,18 +278,26 @@ describe.only(" POST /api/reviews/:review_id/comments", () => {
       "Received 23503 error message: Foreign Key violation"
     );
   });
+});
 
-  // test.only("status:400, Dont insert if body is NULL", async () => {
-  //   const newComment = {
-  //     username: "bainesface",
-  //   };
+describe("DELETE /api/comments/:comment_id", () => {
+  test("status:204, responds with an empty response body", async () => {
+    const response = await request(app).delete("/api/comments/2").expect(204);
+    console.log(response.body);
+    expect(response.body).toEqual({});
+  });
 
-  //   const { body } = await request(app)
-  //     .post("/api/reviews/2/comments")
-  //     .send(newComment)
-  //     .expect(400);
-  //   expect(body.msg).toBe(
-  //     "Received 23503 error message: Foreign Key violation"
-  //   );
-  // });
+  test("Should return 400 for non-existent ID", async () => {
+    const { body } = await request(app).delete("/api/comments/200").expect(400);
+
+    expect(body.msg).toBe("Comment could not be deleted");
+  });
+
+  test("Should return 400 for bad comment ID", async () => {
+    const { body } = await request(app)
+      .delete("/api/comments/myID")
+      .expect(400);
+
+    expect(body.msg).toBe("Received 22P02 error message");
+  });
 });
