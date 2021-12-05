@@ -3,7 +3,7 @@ const { selectCategories } = require("../model/categories.model");
 
 exports.getGreetings = (req, res, next) => {
   try {
-    res.status(200).send({ msg: "all ok" });
+    res.status(200).send({ msg: "all ok on Heroku" });
   } catch (err) {}
 };
 
