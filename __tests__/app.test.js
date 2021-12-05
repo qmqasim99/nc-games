@@ -303,7 +303,7 @@ describe("DELETE /api/comments/:comment_id", () => {
 });
 
 // ! TESTING PAGINATION
-describe.only("TESTING PAGINATION", () => {
+describe("TESTING PAGINATION", () => {
   test("should return comments limited by 2", async () => {
     const {
       body: { comments },
