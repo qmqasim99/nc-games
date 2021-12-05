@@ -301,3 +301,39 @@ describe("DELETE /api/comments/:comment_id", () => {
     expect(body.msg).toBe("Received 22P02 error message");
   });
 });
+
+// ! TESTING PAGINATION
+describe.only("TESTING PAGINATION", () => {
+  test("should return comments limited by 2", async () => {
+    const {
+      body: { comments },
+    } = await request(app)
+      .get("/api/reviews/2/comments?limit=2&p=1")
+      .expect(200);
+
+    expect(comments).toBeInstanceOf(Array);
+    expect(comments).toHaveLength(2);
+  });
+
+  test("should return comments limited by 3", async () => {
+    const {
+      body: { comments },
+    } = await request(app)
+      .get("/api/reviews/2/comments?limit=6&p=1")
+      .expect(200);
+
+    expect(comments).toBeInstanceOf(Array);
+    expect(comments).toHaveLength(3);
+  });
+
+  test("should return comments limited by 1 of page 2", async () => {
+    const {
+      body: { comments },
+    } = await request(app)
+      .get("/api/reviews/2/comments?limit=2&p=2")
+      .expect(200);
+
+    expect(comments).toBeInstanceOf(Array);
+    expect(comments).toHaveLength(1);
+  });
+});

@@ -5,6 +5,7 @@ const {
   selectCommentsByReviewId,
   insertCommentsByReviewId,
 } = require("../model/reviews.model");
+const { pagination } = require("../utils");
 
 exports.getReviews = async (req, res, next) => {
   try {
@@ -45,8 +46,19 @@ exports.patchReviewVotes = async (req, res, next) => {
 exports.getCommentsByReviewId = async (req, res, next) => {
   try {
     const { review_id } = req.params;
+    const limit = req.query.limit;
+    const page = req.query.p;
+
     const comments = await selectCommentsByReviewId(review_id);
-    res.status(200).send({ comments: comments });
+
+    // if limit and page is not undefined
+    if (limit && page) {
+      console.log("IN PAGINATION", limit, page);
+      const paginatedComments = pagination(comments, limit, page);
+      res.status(200).send({ comments: paginatedComments });
+    } else {
+      res.status(200).send({ comments: comments });
+    }
   } catch (err) {
     next(err);
   }
