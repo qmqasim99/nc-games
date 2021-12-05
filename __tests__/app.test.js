@@ -12,7 +12,7 @@ beforeEach(() => {
 
 afterAll(() => db.end());
 
-describe("TEST CATEGORIES", () => {
+describe.only("TEST CATEGORIES", () => {
   test("should return greeting message ", () => {
     return request(app)
       .get("/")
