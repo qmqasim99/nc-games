@@ -1,4 +1,3 @@
-const { orderBy } = require("lodash");
 const db = require("../db/connection");
 
 exports.selectReviews = async (
