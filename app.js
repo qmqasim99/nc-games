@@ -1,30 +1,30 @@
-const express = require("express");
+const express = require('express');
 
 const app = express();
 
-const { getGreetings } = require("./controller/categories.controller");
+const { getGreetings } = require('./controller/categories.controller');
 const {
   handlePSQL400Errors,
   handleCustomError,
   handle500Error,
   handle404Errors,
-} = require("./errors");
+} = require('./errors');
 
-const apiRouter = require("./routes/api.routes");
+const apiRouter = require('./routes/api.routes');
 
 app.use(express.json());
 
-app.route("/").get(getGreetings);
-app.use("/api", apiRouter);
+// app.route("/").get(getGreetings);
+app.use('/api', apiRouter);
 
 // app.all("/*", (req, res) => {
 //   res.status(404).send({ msg: "path not found" });
 // });
 
 app.use((req, res, next) => {
-  const err = new Error("Not Found");
+  const err = new Error('Not Found');
   err.status = 404;
-  err.msg = "We could not fulfil your request";
+  err.msg = 'We could not fulfil your request';
   next(err);
 });
 
