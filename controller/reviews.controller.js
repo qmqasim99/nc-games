@@ -4,8 +4,8 @@ const {
   updateReviewVotes,
   selectCommentsByReviewId,
   insertCommentsByReviewId,
-} = require("../model/reviews.model");
-const { pagination } = require("../utils");
+} = require('../model/reviews.model');
+const { pagination } = require('../utils');
 
 exports.getReviews = async (req, res, next) => {
   try {
@@ -36,9 +36,7 @@ exports.patchReviewVotes = async (req, res, next) => {
     const review = await updateReviewVotes(review_id, voteBody);
     res.status(200).send({ review: review });
   } catch (err) {
-    console.log("IN CONTROLLER ERROR...", err.message);
 
-    console.log(err.status, err.code);
     next(err);
   }
 };
@@ -53,7 +51,6 @@ exports.getCommentsByReviewId = async (req, res, next) => {
 
     // if limit and page is not undefined
     if (limit && page) {
-      console.log("IN PAGINATION", limit, page);
       const paginatedComments = pagination(comments, limit, page);
       res.status(200).send({ comments: paginatedComments });
     } else {
@@ -69,14 +66,9 @@ exports.postCommentsByReviewId = async (req, res, next) => {
     const review_id = req.params.review_id;
     const commentBody = req.body;
 
-    console.log("IN postCommentsByReviewId", review_id, commentBody);
-
     const comment = await insertCommentsByReviewId(review_id, commentBody);
     res.status(201).send({ comment: comment });
   } catch (err) {
-    console.log("IN CONTROLLER ERROR...", err.message);
-
-    console.log(err.status, err.code);
     next(err);
   }
 };

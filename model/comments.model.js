@@ -6,7 +6,7 @@ exports.deleteCommentsById = async (comment_id) => {
     WHERE comment_id=$1 RETURNING *;`,
     [comment_id]
   );
-  console.log(comment.rows[0]);
+
   // if no review found for this id
   if (!comment.rows[0]) {
     return Promise.reject({
