@@ -1,9 +1,6 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-pre {
-  font-family: 'Courier New', Courier, monospace;
-}
 article > details > summary {
   font-size: 20px;
   margin-top: 16px;
@@ -17,4 +14,7 @@ details details {
 details details summary {
   margin-top: 10px;
   font-size: 16px;
+}
+pre {
+  font-family: 'Courier New', Courier, monospace;
 }
