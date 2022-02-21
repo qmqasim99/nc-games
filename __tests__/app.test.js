@@ -53,7 +53,7 @@ describe('TESTING REVIEWS', () => {
   test('Should return 400 for bad review ID', async () => {
     const { body } = await request(app).get('/api/reviews/my100').expect(400);
 
-    expect(body.msg).toBe('Received 22P02 error message');
+    expect(body.msg).toBe('Invalid value');
   });
 });
 
@@ -90,7 +90,7 @@ describe(' TEST VOTE UPDATES ', () => {
       .patch('/api/reviews/2')
       .send(newVote)
       .expect(400);
-    expect(body.msg).toBe('Received 22P02 error message');
+    expect(body.msg).toBe('Invalid value');
   });
 });
 
@@ -203,7 +203,7 @@ describe('GET COMMENTS BY REVIEW ID', () => {
       .get('/api/reviews/myID/comments')
       .expect(400);
 
-    expect(body.msg).toBe('Received 22P02 error message');
+    expect(body.msg).toBe('Invalid value');
   });
 
   test('Should return 400 for invalid path', async () => {
@@ -264,9 +264,7 @@ describe(' POST /api/reviews/:review_id/comments', () => {
       .post('/api/reviews/2/comments')
       .send(newComment)
       .expect(400);
-    expect(body.msg).toBe(
-      'Received 23503 error message: Foreign Key violation'
-    );
+    expect(body.msg).toBe('Invalid value');
   });
 });
 
@@ -288,7 +286,7 @@ describe('DELETE /api/comments/:comment_id', () => {
       .delete('/api/comments/myID')
       .expect(400);
 
-    expect(body.msg).toBe('Received 22P02 error message');
+    expect(body.msg).toBe('Invalid value');
   });
 });
 
